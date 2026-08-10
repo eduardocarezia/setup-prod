@@ -7,8 +7,10 @@
 #   1. NUNCA troca de branch, nunca escreve no working tree, nunca mexe no índice
 #      principal. Usa plumbing + GIT_INDEX_FILE. Outro chat pode estar trabalhando
 #      no mesmo diretório.
-#   2. Uma branch por sessão (docs-auto/<id>) — dois chats nunca disputam o mesmo
-#      ref, então o hook jamais precisa resolver conflito sem humano.
+#   2. Grava em refs/docs-autosave/<id>, FORA de refs/heads/. Não é branch: não
+#      aparece em `git branch`, nunca sofre checkout. Um ref por sessão, então
+#      dois chats nunca disputam o mesmo ref e o hook jamais precisa resolver
+#      conflito sem humano presente.
 #   3. Só documentação. Nunca código.
 #   4. Nunca quebra o turno. Toda falha sai com 0.
 #
@@ -39,7 +41,7 @@ git rev-parse --verify HEAD >/dev/null 2>&1 || exit 0
 sid=$(printf '%s' "$payload" | jq -r '.session_id // empty' 2>/dev/null \
       | tr -cd 'a-zA-Z0-9' | cut -c1-12)
 [ -n "$sid" ] || sid="nosession"
-branch="docs-auto/$sid"
+ref="refs/docs-autosave/$sid"
 
 # --- o que conta como documentação -------------------------------------------
 paths=()
@@ -54,9 +56,9 @@ rm -f "$tmpindex"                      # git quer criar ele mesmo
 export GIT_INDEX_FILE="$tmpindex"
 trap 'rm -f "$tmpindex"' EXIT
 
-# base do commit: a branch da sessão se já existe, senão o HEAD atual
-if git show-ref --verify --quiet "refs/heads/$branch"; then
-  parent=$(git rev-parse "refs/heads/$branch" 2>/dev/null) || exit 0
+# base do commit: o ref da sessão se já existe, senão o HEAD atual
+if git show-ref --verify --quiet "$ref"; then
+  parent=$(git rev-parse "$ref" 2>/dev/null) || exit 0
 else
   parent=$(git rev-parse HEAD 2>/dev/null) || exit 0
 fi
@@ -73,25 +75,25 @@ if [ "$tree" = "$(git rev-parse "$parent^{tree}" 2>/dev/null)" ]; then
 fi
 
 stamp=$(date '+%Y-%m-%d %H:%M:%S')
-commit=$(printf 'docs: autosave %s\n\nSessao: %s\nBranch de origem: %s\n' \
-           "$stamp" "$sid" "$(git rev-parse --abbrev-ref HEAD 2>/dev/null)" \
+commit=$(printf 'docs: autosave %s\n\nSessao: %s\nHEAD na hora: %s\n' \
+           "$stamp" "$sid" "$(git rev-parse --short HEAD 2>/dev/null)" \
          | git commit-tree "$tree" -p "$parent" 2>/dev/null) || exit 0
 [ -n "$commit" ] || exit 0
 
 # compare-and-swap: só move o ref se ninguém o moveu desde que lemos
-if git show-ref --verify --quiet "refs/heads/$branch"; then
-  git update-ref "refs/heads/$branch" "$commit" "$parent" 2>/dev/null || exit 0
+if git show-ref --verify --quiet "$ref"; then
+  git update-ref "$ref" "$commit" "$parent" 2>/dev/null || exit 0
 else
-  git update-ref "refs/heads/$branch" "$commit" "" 2>/dev/null || exit 0
+  git update-ref "$ref" "$commit" "" 2>/dev/null || exit 0
 fi
 
 # --- push (o backup em si) ----------------------------------------------------
 git remote get-url origin >/dev/null 2>&1 || exit 0   # sem remoto: commit local basta
 
-if ! git push -q origin "refs/heads/$branch:refs/heads/$branch" 2>/dev/null; then
+if ! git push -q origin "$ref:$ref" 2>/dev/null; then
   # commit local existe (recuperável), mas o backup remoto falhou — avise
-  printf '{"systemMessage":"docs-autosave: commit local em %s ok, push falhou (sem rede?). Rode: git push origin %s"}\n' \
-    "$branch" "$branch"
+  printf '{"systemMessage":"docs-autosave: commit local em %s ok, push falhou (sem rede?). Rode: git push origin %s:%s"}\n' \
+    "$ref" "$ref" "$ref"
 fi
 
 exit 0

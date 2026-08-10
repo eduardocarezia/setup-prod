@@ -16,6 +16,7 @@ Backup em nuvem do setup que vive em
 | `MASTER.md` | Mapa mestre do projeto: registro de todo item criado, versão, estado, interfaces, dependências. Índice e interfaces, nunca conteúdo. |
 | `STACK.md` | Contrato da stack travada e suas fronteiras. Fonte **única** — nenhum agente repete a stack no próprio prompt. |
 | `REQUIREMENTS.md` | Tudo que precisa existir para o setup funcionar, com o estado real verificado em disco: versões, origens, lacunas conhecidas e script de verificação. |
+| `HOOKS.md` | Configuração de hooks para copiar e colar, com invariantes, recuperação e como desligar. |
 
 ### `agents/` — 25 agentes que **não** têm pacote
 
@@ -38,7 +39,8 @@ Restauração: `cp agents/*.md ~/.claude/agents/`
 |---|---|
 | `docs-autosave.sh` | Hook `Stop`: commita e faz push da documentação numa branch por sessão (`docs-auto/<id>`). Nunca troca de branch, nunca toca o working tree, seguro com vários chats simultâneos. Opt-in por repositório: só age onde existe `MASTER.md`. |
 
-Instalação: copiar para `~/.claude/hooks/`, `chmod +x`, e registrar em `~/.claude/settings.json`:
+Passo a passo completo em [`HOOKS.md`](HOOKS.md). Resumo: copiar para `~/.claude/hooks/`,
+`chmod +x`, e registrar em `~/.claude/settings.json`:
 
 ```json
 {
@@ -49,6 +51,16 @@ Instalação: copiar para `~/.claude/hooks/`, `chmod +x`, e registrar em `~/.cla
   }
 }
 ```
+
+### `superclaude-custom/` — arquivos do SuperClaude com edição local
+
+`superclaude install` **sobrescreve** estes. Restaure daqui depois de atualizar o pacote.
+
+| Arquivo | Edição |
+|---|---|
+| `RULES.md` | Seção *Git Workflow*: era "Feature Branches Only — never work on main". Trocado por "trabalhe SEMPRE na main, nunca crie nem troque de branch". Trocar de branch quebra sessões paralelas que compartilham o working tree, e aqui o deploy é por comando da Railway, não push-to-deploy. |
+
+Restauração: `cp superclaude-custom/RULES.md ~/.claude/RULES.md`
 
 ## Stack travada
 
