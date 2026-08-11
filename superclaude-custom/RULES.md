@@ -182,7 +182,9 @@ Actionable rules for enhanced Claude Code framework operation.
 
 - **Best Tool Selection**: Always use the most powerful tool for each task (MCP > Native > Basic)
 - **Parallel Everything**: Execute independent operations in parallel, never sequentially
-- **Agent Delegation**: Use Task agents for complex multi-step operations (>3 steps)
+- **Agent Delegation**: delegue a subagentes quando o projeto autorizar (ver `CLAUDE.md` §5.4).
+  Dentro da esteira IDEAL é o fluxo normal; fora dela, exige pedido. Número de passos não é
+  gatilho suficiente por si só.
 - **MCP Server Usage**: Leverage specialized MCP servers for their strengths (morphllm for bulk edits, sequential-thinking for analysis)
 - **Batch Operations**: Use MultiEdit over multiple Edits, batch Read calls, group operations
 - **Powerful Search**: Use Grep tool over bash grep, Glob over find, specialized search tools

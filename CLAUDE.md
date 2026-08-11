@@ -66,6 +66,8 @@ de volta para ele em vez de executá-lo.
 |---|---|---|
 | `MASTER.md` | Mapa mestre: registro de todo item criado, versão, estado, interfaces, dependências | **Antes de criar qualquer coisa** |
 | `STACK.md` | Contrato da stack travada (Railway · Convex · Clerk · React/Next/shadcn) e suas fronteiras | Em **todo** trabalho de software |
+| `ORQUESTRACAO.md` | Catálogo de padrões multi-agente e a frase que aciona cada um | Ao montar workflow (§5.4) |
+| `HOOKS.md` | Automação de harness: config pronta, invariantes, recuperação | Ao mexer em hook |
 | `docs/ideal/<ID>-<slug>/` | Os 5 artefatos daquele item | Ao trabalhar naquele item |
 | `docs/diagramas/mestre.puml` | Mapa BPMN de todos os processos | Ao acoplar processo |
 | `docs/diagramas/arquitetura.puml` | Mapa UML de todo o software | Ao acoplar software |
@@ -236,6 +238,60 @@ sugira "seria melhor uma branch".
 > O hook `docs-autosave` grava em `refs/docs-autosave/<sessão>`, **fora** de `refs/heads/`.
 > Não é branch, não aparece em `git branch`, e nunca é feito checkout dele — é ref de backup,
 > escrita apenas. Ver `HOOKS.md`.
+
+### 5.4 Orquestração de agentes — qual nível usar
+
+Roteador. O catálogo de padrões, com a frase de acionamento de cada um, está em
+**`ORQUESTRACAO.md`** — leia quando for montar. Não replique nada dele aqui (§0.1).
+
+| Nível | O que é | Use quando |
+|---|---|---|
+| **Solo** | Eu faço direto | Cabe num raciocínio; você já sabe o arquivo ou símbolo |
+| **Subagente** | 1 agente com contexto próprio; o pai recebe só a conclusão | Varrer muitos arquivos · trabalho independente em paralelo · isolar contexto grande |
+| **Workflow dinâmico** | Script que orquestra N agentes; roda em background | Precisa de **cobertura**, **confiança** (verificação independente) ou **escala** que não cabe num contexto |
+
+Não é escada de prestígio: workflow para tarefa pequena é desperdício; solo para auditoria ampla
+é falso conforto.
+
+#### Antes de montar: já existe pronto
+
+| Comando | Faz |
+|---|---|
+| `/code-review <nível>` | Revisão multi-agente adversarial do diff. `ultra` roda na nuvem, em background |
+| `/security-review` | Varredura de segurança |
+
+São built-in do harness (não têm arquivo em disco). **Use antes de mandar montar um workflow.**
+
+#### Acionamento
+
+**Dentro da esteira eu disparo sem pedir.** Os orquestradores e agentes de fase (§2, §3, §4) são
+subagentes previstos por contrato — o `/sc:pm` já é a autorização. A §4 inclusive **manda**
+paralelizar dentro da etapa.
+
+**Fora da esteira**, para trabalho não roteado, eu não abro workflow dinâmico por conta própria.
+Autoriza:
+
+- **Nomear o padrão** — *"roda um review adversarial"*, *"varredura multi-modal"*. Frases exatas
+  na coluna *Diga assim* do `ORQUESTRACAO.md`. **É o caminho barato: resultado de workflow sem `ultracode`.**
+- **Pedir em linguagem natural** — *"usa um workflow"*, *"fan out"*, *"orquestra com subagentes"*
+- **A keyword `ultracode`** — a única do harness. Liga workflow dinâmico e sobe o esforço para o
+  turno inteiro; custo deixa de ser restrição
+- Uma skill ou comando que mande
+
+Sem isso eu faço solo. Se achar que vale orquestrar, **escolho o padrão e digo qual escolhi** —
+não paro para perguntar (§0.2).
+
+#### Duas regras que valem sempre
+
+**Escrita em paralelo vai isolada.** Leitura paralela é livre. Dois agentes editando a mesma
+árvore se sobrescrevem em silêncio — e a §5.3 lembra que outros chats usam esta mesma árvore.
+Fan-out que escreve roda em worktree isolada.
+
+**Sem teto silencioso.** Workflow que limitou algo — top-N, amostragem, corte por tempo —
+declara no resultado o que ficou de fora. Truncar em silêncio se lê como "cobri tudo".
+
+Limites de concorrência e tamanho são da ferramenta e mudam com máquina e versão — não estão
+fixados aqui. `/workflows` acompanha as execuções.
 
 ---
 
