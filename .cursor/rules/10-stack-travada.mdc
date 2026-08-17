@@ -1,0 +1,57 @@
+---
+description: Stack travada (Railway, Convex, Clerk, React/Next/shadcn) e suas fronteiras. Aplica a todo codigo.
+globs: **/*.ts,**/*.tsx,**/*.js,**/*.jsx,**/*.json,Dockerfile,**/*.css
+alwaysApply: false
+---
+
+# Stack travada
+
+O contrato completo está em @STACK.md — leia antes de escrever código. Este arquivo é só o
+lembrete das fronteiras.
+
+| Camada | Ferramenta |
+|---|---|
+| Hospedagem | **Railway** (container Docker) |
+| Backend e dados | **Convex** |
+| Autenticação | **Clerk**, integrado ao Convex |
+| Frontend | **React + Next.js** (App Router) + **shadcn/ui** |
+
+**Travado** significa: não proponha alternativa, não compare, não "avalie se vale a pena".
+Pedido que exige sair daqui é recusado citando a fronteira violada (`STACK.md` §2).
+
+## Proibido
+
+Vercel · Netlify · outro host · Postgres · Supabase · Mongo · Prisma · Drizzle · NextAuth ·
+Auth0 · auth caseiro · API REST custom para dados (`app/api/*`) · MUI · Chakra · Bootstrap ·
+shadcn como dependência npm · `pages/` router · cron externo · chamada HTTP externa dentro de
+`query` ou `mutation`.
+
+Exceção só existe com decisão registrada no `MASTER.md`. **Leia a seção de exceções do
+`STACK.md` §2 antes de assumir violação** — este projeto pode ter uma exceção ativa e legítima.
+
+## Convex — as que mais quebram
+
+- **Sem JOIN.** Desnormalize ou faça múltiplas queries.
+- **Sem offset/skip.** Paginação por cursor.
+- **Sem recursão nativa.** Árvore leva campo `depth` com teto.
+- `query`/`mutation` são puros e transacionais. I/O externo só em `action`.
+- Args sempre com validators explícitos. Nunca campo "a definir".
+- Tipos vêm do Convex: `Doc<"tabela">`, `Id<"tabela">`. Não recrie tipo à mão.
+
+## Auth — o padrão que não se negocia
+
+Identidade vem sempre do backend:
+
+```typescript
+const identity = await ctx.auth.getUserIdentity()
+if (!identity) throw new ConvexError("Não autenticado")
+// identity.subject === Clerk user id
+```
+
+**Nunca aceite `userId` como argumento vindo do cliente** — é falsificável. Wiring canônico do
+Clerk↔Convex em `STACK.md` §4, com os quatro erros clássicos.
+
+## Antes de escrever API de Convex, Clerk ou Next
+
+Confirme a assinatura atual na documentação. Essas quatro envelhecem rápido e conhecimento de
+treino sobre elas erra em silêncio.

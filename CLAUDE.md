@@ -68,6 +68,7 @@ de volta para ele em vez de executá-lo.
 | `STACK.md` | Contrato da stack travada (Railway · Convex · Clerk · React/Next/shadcn) e suas fronteiras | Em **todo** trabalho de software |
 | `ORQUESTRACAO.md` | Catálogo de padrões multi-agente e a frase que aciona cada um | Ao montar workflow (§5.4) |
 | `HOOKS.md` | Automação de harness: config pronta, invariantes, recuperação | Ao mexer em hook |
+| `AGENTS.md` + `.cursor/rules/` | Porta de entrada neutra: o que deste contrato vale fora do Claude Code | Ao trabalhar no Cursor ou outra ferramenta |
 | `docs/ideal/<ID>-<slug>/` | Os 5 artefatos daquele item | Ao trabalhar naquele item |
 | `docs/diagramas/mestre.puml` | Mapa BPMN de todos os processos | Ao acoplar processo |
 | `docs/diagramas/arquitetura.puml` | Mapa UML de todo o software | Ao acoplar software |

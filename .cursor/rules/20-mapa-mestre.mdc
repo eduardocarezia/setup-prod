@@ -1,0 +1,48 @@
+---
+description: Protocolo de acoplamento e iteracao. Use ao criar ou alterar documentacao, artefatos da esteira IDEAL ou diagramas.
+globs: docs/**/*.md,docs/**/*.puml,claudedocs/**/*.md,MASTER.md
+alwaysApply: false
+---
+
+# Acoplamento no mapa mestre
+
+Contrato completo em @CLAUDE.md §7 e §8. O registro é @MASTER.md.
+
+## Antes de escrever no Registro — três checagens
+
+1. **Duplicidade** — existe item no `MASTER.md` que já entrega esse resultado? Existe → não crie
+   linha nova, versione o existente.
+2. **Interface** — `Entrada` e `Saída` declaradas em termos concretos: artefato, formato, gatilho.
+   *"Melhora o processo"* não é saída. *"Ata com 3 decisões"* é.
+3. **Impacto** — quem consome e quem é consumido. A ligação é **bidirecional**: se `PRC-007`
+   depende de `SW-003`, as duas linhas mudam.
+
+Falhou qualquer uma → volte ao Desenhar. Não force o encaixe.
+
+## O que muda, na ordem
+
+1. `00-ficha.md` do item preenchida
+2. Linha no Registro do `MASTER.md`, com data
+3. Dependências nos **dois** sentidos
+4. Nó conectado no diagrama mestre — **nó solto significa que não terminou**
+5. `CHANGELOG.md` do item
+6. Histórico de acoplamentos: append, nunca reescrever linha antiga
+
+## Iteração — onde a mudança reentra
+
+| A mudança… | Versão | Reentra em |
+|---|---|---|
+| Não muda entrada/saída (bug, texto, ajuste interno) | `1.0 → 1.1` | Executar |
+| Muda entrada, saída ou dependência | `1.x → 2.0` | **Desenhar** |
+| Muda o problema ou o usuário-alvo | **ID novo** | Idealizar |
+
+**Mudança de interface nunca é patch.** Se `Usado por` não está vazio e a interface mudou, os
+consumidores são notificados na mesma passagem — ou o acoplamento quebra em silêncio.
+
+Item lançado nunca é deletado. É depreciado, com ponteiro para o sucessor.
+
+## Este arquivo guarda índice, não conteúdo
+
+O `MASTER.md` registra ID, versão, estado e interface. O conteúdo mora em
+`docs/ideal/<ID>-<slug>/`. Engordar o `MASTER.md` com detalhe do item infla toda sessão de
+toda ferramenta.

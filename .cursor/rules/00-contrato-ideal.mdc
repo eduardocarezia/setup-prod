@@ -1,0 +1,52 @@
+---
+description: Contrato universal de criacao (esteira IDEAL), conduta de entrega e regra de git. Vale para todo trabalho neste projeto.
+alwaysApply: true
+---
+
+# Contrato deste projeto
+
+Leia estes arquivos antes de trabalhar. Eles são a fonte de verdade, não este arquivo:
+
+@AGENTS.md
+@CLAUDE.md
+@MASTER.md
+
+`AGENTS.md` §2 e §3 dizem o que do `CLAUDE.md` vale aqui no Cursor e o que é exclusivo do
+Claude Code. Não tente executar `/sc:*`, subagentes ou hooks — não existem nesta ferramenta.
+
+## Não negociável
+
+**Git: trabalhe sempre na `main`.** Nunca crie branch, nunca troque de branch, nunca entregue PR
+como resultado. O working tree é compartilhado com outras sessões de IA abertas no mesmo
+diretório — `git checkout` arranca o trabalho da outra. Ponto de restauração é commit.
+Detalhe em `CLAUDE.md` §5.3.
+
+**Entregue, não interrogue.** Diante de ambiguidade: adote a leitura mais provável, declare a
+suposição em uma linha, e entregue. Pergunta só quando seguir seria irreversível ou tornaria o
+trabalho inútil se errado — e no máximo uma rodada, com recomendação. Proibido terminar sem
+entregar nada quando havia algo entregável. `CLAUDE.md` §0.2.
+
+**Se o usuário pedir o mesmo resultado duas vezes com palavras diferentes**, isso significa que
+você não entregou — não que o pedido está confuso. Pare de perguntar, diga em uma frase o que
+está travando, e entregue a menor versão completa. `CLAUDE.md` §0.3.
+
+**Referência, não cópia.** Não replique conteúdo de um documento dentro de outro. Cite o arquivo
+e a seção. `CLAUDE.md` §0.1.
+
+## Antes de criar qualquer coisa
+
+Consulte o `MASTER.md`. Se já existe item que entrega esse resultado, **versione o existente** em
+vez de criar outro — duplicidade silenciosa é o primeiro anti-padrão (`CLAUDE.md` §9).
+
+Item novo segue a estrutura da §6: ID `<TIPO>-<NNN>`, pasta `docs/ideal/<ID>-<slug>/`, artefatos
+numerados de `01-idealizar.md` a `05-lancar.md`. Ao terminar, execute o Protocolo de Acoplamento
+(§7): linha no Registro, dependências nos dois sentidos, nó conectado no diagrama mestre.
+
+Mudança em item existente segue a §8: se muda entrada, saída ou dependência, **não é patch** —
+é versão maior e reentra no Desenhar.
+
+## Diagramas
+
+Todo item passa por Desenhar com ao menos um diagrama. Saída sempre em fence ` ```plantuml `,
+nunca ` ```text `. Um arquivo por item em `docs/diagramas/<ID>.puml`. Nomes dos nós iguais aos do
+`MASTER.md`. Aqui não há skill de geração — escreva o PlantUML à mão. `CLAUDE.md` §5.1.
